@@ -44,10 +44,16 @@ def desktop_config_path() -> Path:
     return Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
 
 
+def antigravity_dir() -> Path:
+    """Antigravity (and the Gemini CLI) keep shared config in ~/.gemini/config."""
+    return Path.home() / ".gemini" / "config"
+
+
 def detect_clients() -> List[Dict[str, Any]]:
     return [
         {"key": "claude_code", "found": bool(find_claude_cli()) or (Path.home() / ".claude").exists()},
         {"key": "claude_desktop", "found": desktop_config_path().parent.exists()},
+        {"key": "antigravity", "found": (Path.home() / ".gemini").exists()},
     ]
 
 
@@ -58,6 +64,11 @@ def server_command() -> Dict[str, Any]:
         "args": ["-m", brand.SLUG, "mcp"],
         "env": {"PYTHONPATH": str(config.REPO_DIR / "src")},
     }
+
+
+def launcher_command() -> Dict[str, Any]:
+    """Same server, started through a launcher file instead of PYTHONPATH."""
+    return {"command": sys.executable, "args": [str(config.REPO_DIR / "src" / "optima_launcher.py"), "mcp"]}
 
 
 # ---------- install steps ----------
@@ -111,6 +122,28 @@ def register_claude_desktop(lang: str) -> List[str]:
     return [t(lang, "cli_desktop_ok", path=str(path)), t(lang, "cli_desktop_skill", path=str(skill_zip()))]
 
 
+def register_antigravity(lang: str) -> List[str]:
+    base = antigravity_dir()
+    base.mkdir(parents=True, exist_ok=True)
+    # Skill
+    dest = base / "skills" / brand.SLUG
+    if dest.exists():
+        shutil.rmtree(dest)
+    shutil.copytree(SKILL_SRC, dest)
+    # MCP server
+    path = base / "mcp_config.json"
+    data: Dict[str, Any] = {}
+    if path.exists() and path.stat().st_size > 0:
+        try:
+            data = json.loads(path.read_text("utf-8"))
+        except ValueError:
+            data = {}
+        shutil.copy2(path, path.with_name(path.name + f".bak-{int(time.time())}"))
+    data.setdefault("mcpServers", {})[brand.SLUG] = launcher_command()
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), "utf-8")
+    return [t(lang, "cli_antigravity_ok", path=str(base))]
+
+
 def apply(lang: str, clients: List[str]) -> List[str]:
     cfg = config.load()
     cfg["language"] = lang
@@ -130,6 +163,11 @@ def apply(lang: str, clients: List[str]) -> List[str]:
             results.extend(register_claude_desktop(lang))
         except Exception as e:
             results.append(f"Claude Desktop: {e}")
+    if "antigravity" in clients:
+        try:
+            results.extend(register_antigravity(lang))
+        except Exception as e:
+            results.append(f"Antigravity: {e}")
     return results
 
 

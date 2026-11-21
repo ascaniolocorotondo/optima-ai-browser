@@ -95,8 +95,8 @@ The installer opens the Optima window:
 
 1. **Choose your language.** English, Italiano, Español, Français, Deutsch or Português.
    Banners and notifications use it; the agent always gets English.
-2. **Connect your assistants.** Optima detects Claude Code and the Claude Desktop app, installs
-   its skill and registers its MCP server.
+2. **Connect your assistants.** Optima detects **Claude Code**, the **Claude Desktop** app and
+   **Google Antigravity**, installs its skill and registers its MCP server in each one you pick.
 3. **Log in to your favourite sites** in that same window, so your assistant finds you signed in.
 
 Prefer the terminal? `sh install.sh --cli` (or `install.ps1 --cli`).
@@ -104,19 +104,28 @@ Prefer the terminal? `sh install.sh --cli` (or `install.ps1 --cli`).
 Then restart your assistant and try: *"Use Optima to find the opening hours of the nearest
 library."*
 
+### Where Optima connects
+
+| Assistant | Skill | MCP server |
+|---|---|---|
+| Claude Code | `~/.claude/skills/optima/` | user scope (`claude mcp add-json`) |
+| Claude Desktop | upload `~/.optima/optima-skill.zip` in Settings → Capabilities → Skills | `claude_desktop_config.json` |
+| Google Antigravity | `~/.gemini/config/skills/optima/` | `~/.gemini/config/mcp_config.json` |
+
 ### Connecting other MCP clients
 
-Any MCP client can use Optima. The server command is:
+Any MCP client can use Optima. The server command needs no environment variables:
 
 ```json
 {
   "command": "/path/to/python",
-  "args": ["-m", "optima", "mcp"],
-  "env": { "PYTHONPATH": "~/.optima/app/src" }
+  "args": ["~/.optima/app/src/optima_launcher.py", "mcp"]
 }
 ```
 
-On Windows and Linux, `/path/to/python` is `~/.optima/venv/…/python`.
+On macOS `/path/to/python` is your `python3`; on Windows and Linux it is the one in
+`~/.optima/venv`. Copy `skill/optima/` into your assistant's skills folder if it supports
+[Agent Skills](https://agentskills.io).
 
 ## Tools for the agent
 
