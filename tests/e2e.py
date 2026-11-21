@@ -75,6 +75,10 @@ try:
     check("refuse typing into a button", err and "not a text field" in out, out)
 
     err, out = tool("browser_type", id="1", text="scarpe", submit=True)
+    if "Risultati per: scarpe" not in out:  # diagnostics for slow engines
+        print("DEBUG first result:\n" + out[:600])
+        _, out = tool("browser_wait", seconds=2)
+        print("DEBUG after 2s:\n" + out[:600])
     check("type + submit search", not err and "Risultati per: scarpe" in out, out)
 
     err, out = tool("browser_type", id="4", text="secret")
