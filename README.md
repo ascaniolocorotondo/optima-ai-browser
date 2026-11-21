@@ -8,7 +8,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ascaniolocorotondo/optima-ai-browser/actions/workflows/test.yml"><img src="https://github.com/ascaniolocorotondo/optima-ai-browser/actions/workflows/test.yml/badge.svg" alt="tests"></a><br>
+  <a href="https://github.com/ascaniolocorotondo/optima-ai-browser/actions/workflows/test.yml"><img src="https://github.com/ascaniolocorotondo/optima-ai-browser/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+  <a href="https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser"><img src="https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser/badges/score.svg" alt="Glama score"></a><br>
   macOS · Windows · Linux &nbsp;|&nbsp; MCP server + Claude skill &nbsp;|&nbsp; MIT
 </p>
 
