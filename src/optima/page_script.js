@@ -195,12 +195,20 @@ if (!window.__ab) {
         setValue(el, text);
       }
       if (submit) {
-        var opts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true };
-        el.dispatchEvent(new KeyboardEvent('keydown', opts));
-        el.dispatchEvent(new KeyboardEvent('keypress', opts));
-        el.dispatchEvent(new KeyboardEvent('keyup', opts));
         var form = el.form || el.closest('form');
-        if (form) { if (form.requestSubmit) form.requestSubmit(); else form.submit(); }
+        if (form) {
+          // Submit the form directly. Synthetic Enter key events behave differently
+          // across WebKit versions (some reload the page), so we avoid them here.
+          var btn = form.querySelector('button[type=submit], input[type=submit], button:not([type])');
+          if (form.requestSubmit) form.requestSubmit(btn || undefined);
+          else if (btn) btn.click();
+          else form.submit();
+        } else {
+          // No form: search boxes driven by JavaScript listen for the Enter key.
+          var opts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+          el.dispatchEvent(new KeyboardEvent('keydown', opts));
+          el.dispatchEvent(new KeyboardEvent('keyup', opts));
+        }
       }
       return { ok: true };
     }
