@@ -1,0 +1,6 @@
+.git
+.github
+engines/macos/build
+assets
+tests
+**/__pycache__

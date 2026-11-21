@@ -61,3 +61,18 @@ jobs:
         env:
           OPTIMA_DEBUG: "1"
         run: python3 tests/e2e.py --engine webkit
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t optima .
+      - name: MCP introspection inside the container
+        run: |
+          printf '%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}' \
+            '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+            | docker run -i --rm optima | tee out.jsonl
+          python3 -c "import json; r=[json.loads(l) for l in open('out.jsonl')]; assert r[0]['result']['serverInfo']['name']=='optima'; assert len(r[1]['result']['tools'])==11; print('container OK')"
