@@ -200,8 +200,10 @@ if (!window.__ab) {
           // Submit the form directly. Synthetic Enter key events behave differently
           // across WebKit versions (some reload the page), so we avoid them here.
           var btn = form.querySelector('button[type=submit], input[type=submit], button:not([type])');
-          if (form.requestSubmit) form.requestSubmit(btn || undefined);
-          else if (btn) btn.click();
+          // Clicking the form's own submit button is what a person does, and it is
+          // the path every engine handles the same way (requestSubmit is not, on older WebKit).
+          if (btn) btn.click();
+          else if (form.requestSubmit) form.requestSubmit();
           else form.submit();
         } else {
           // No form: search boxes driven by JavaScript listen for the Enter key.
