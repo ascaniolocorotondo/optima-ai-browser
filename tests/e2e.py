@@ -69,6 +69,8 @@ try:
 
     err, out = tool("browser_open", url=base + "/")
     check("open page", not err and "Negozio" in out, out)
+    if os.environ.get("OPTIMA_DEBUG"):
+        print("DEBUG open result:\n" + out[:900])
     check("cookie banner declined", "Rifiuta tutto" in out and "Cookie rifiutati" in out, out)
 
     err, out = tool("browser_type", id="2", text="x")

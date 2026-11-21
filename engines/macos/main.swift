@@ -71,6 +71,8 @@ final class Engine: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUID
             webView.load(URLRequest(url: URL(string: "https://duckduckgo.com")!))
             window.makeFirstResponder(addressLabel)
         } else {
+            // When the assistant drives the window, the page has focus, not the address bar.
+            window.makeFirstResponder(webView)
             startReadingCommands()
             wire.send(["event": "ready"])
         }
@@ -119,6 +121,9 @@ final class Engine: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUID
     @objc func focusAddress() { window.makeFirstResponder(addressLabel) }
 
     @objc func addressEntered() {
+        // NSTextField also fires its action when it merely loses focus (for example when
+        // the agent focuses a field in the page). Only a real Return key press navigates.
+        guard let ev = NSApp.currentEvent, ev.type == .keyDown, ev.keyCode == 36 || ev.keyCode == 76 else { return }
         let text = addressLabel.stringValue.trimmingCharacters(in: .whitespaces)
         if text.isEmpty { return }
         var url: URL?
@@ -168,6 +173,7 @@ final class Engine: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUID
         addressLabel.bezelStyle = .roundedBezel
         addressLabel.target = self
         addressLabel.action = #selector(addressEntered)
+        (addressLabel.cell as? NSTextFieldCell)?.sendsActionOnEndEditing = false
         addressLabel.translatesAutoresizingMaskIntoConstraints = false
 
         topBar.addSubview(badge)
@@ -282,6 +288,7 @@ final class Engine: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUID
         let id = msg["id"] ?? NSNull()
         let cmd = msg["cmd"] as? String ?? ""
         let args = msg["args"] as? [String: Any] ?? [:]
+        log("cmd \(cmd)")
         let timeout = (args["timeout"] as? Double) ?? 30
 
         switch cmd {
@@ -400,11 +407,26 @@ final class Engine: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUID
 
     // MARK: WKNavigationDelegate
 
+    let debug = ProcessInfo.processInfo.environment["OPTIMA_DEBUG"] != nil
+
+    func log(_ s: String) {
+        guard debug else { return }
+        FileHandle.standardError.write(("[engine] " + s + "\n").data(using: .utf8)!)
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        log("navigate type=\(navigationAction.navigationType.rawValue) main=\(navigationAction.targetFrame?.isMainFrame ?? false) " +
+            "method=\(navigationAction.request.httpMethod ?? "?") url=\(navigationAction.request.url?.absoluteString ?? "")")
+        decisionHandler(.allow)
+    }
+
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         addressLabel.stringValue = webView.url?.absoluteString ?? ""
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        log("finished \(webView.url?.absoluteString ?? "")")
         addressLabel.stringValue = webView.url?.absoluteString ?? ""
         finishLoads()
     }
@@ -426,6 +448,7 @@ final class Engine: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUID
     // Links that open a new window load in this one: the agent works in a single tab.
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        log("new-window request type=\(navigationAction.navigationType.rawValue) url=\(navigationAction.request.url?.absoluteString ?? "")")
         if navigationAction.targetFrame == nil { webView.load(navigationAction.request) }
         return nil
     }

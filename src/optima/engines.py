@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import queue
 import subprocess
 import threading
@@ -99,7 +100,8 @@ class WebKitEngine(Engine):
             suffix += " " + brand.ua_suffix(__version__)
         self.proc = subprocess.Popen(
             [str(binary), "--ua-suffix", suffix, "--title", brand.FULL_NAME],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=None if os.environ.get("OPTIMA_DEBUG") else subprocess.DEVNULL,
             text=True, bufsize=1, encoding="utf-8",
         )
         self.lines = queue.Queue()

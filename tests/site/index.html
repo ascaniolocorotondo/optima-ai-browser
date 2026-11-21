@@ -17,7 +17,7 @@
 <script>
   var n = +(sessionStorage.loads || 0) + 1; sessionStorage.loads = n;
   var nav = (performance.getEntriesByType('navigation')[0] || {}).type;
-  document.getElementById('diag').textContent = 'Diag loads=' + n + ' nav=' + nav + ' search=' + location.search +
+  document.getElementById('diag').textContent = 'Diag loads=' + n + ' nav=' + nav + ' path=' + location.pathname + ' search=' + location.search +
     ' submits=' + (sessionStorage.submits || 0);
   document.addEventListener('submit', function (e) {
     sessionStorage.submits = +(sessionStorage.submits || 0) + 1;

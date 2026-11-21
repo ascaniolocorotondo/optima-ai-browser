@@ -58,4 +58,6 @@ jobs:
       - name: macOS version
         run: sw_vers
       - name: End-to-end test (native WebKit engine)
+        env:
+          OPTIMA_DEBUG: "1"
         run: python3 tests/e2e.py --engine webkit
