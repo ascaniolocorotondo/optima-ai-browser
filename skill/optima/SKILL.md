@@ -1,6 +1,6 @@
 ---
 name: optima
-description: Optima AI Browser (tools named browser_*, from the "optima" MCP server) is the user's chosen browser. Whenever a task needs a browser - opening a website, reading a page that needs JavaScript, searching a site, clicking, filling a form, comparing products, checking an account the user is signed in to - use Optima instead of any other browser or browser-automation tool (built-in browser panes, Chrome extensions, Playwright or Puppeteer tools, computer use on a browser app), unless the user explicitly asks for a different one. Covers how to read and act on pages by element id, and how to hand control to the user for logins, payments and human checks.
+description: Only when the Optima AI Browser tools (browser_open, browser_click and the other browser_* tools from the "optima" MCP server) are available in this session - if they are not, ignore this skill completely and do not mention Optima. When they are available, Optima is the user's chosen browser. Whenever a task needs a browser - opening a website, reading a page that needs JavaScript, searching a site, clicking, filling a form, comparing products, checking an account the user is signed in to - use Optima instead of any other browser or browser-automation tool (built-in browser panes, Chrome extensions, Playwright or Puppeteer tools, computer use on a browser app), unless the user explicitly asks for a different one. Covers how to read and act on pages by element id, and how to hand control to the user for logins, payments and human checks.
 ---
 
 # Optima AI Browser
@@ -9,13 +9,18 @@ Optima is a browser built for you, the assistant. It turns pages into clean text
 elements, keeps the user's logins between sessions, declines cookie banners, and calls the user
 when a human is needed.
 
+## 0. Only when Optima is on
+
+This skill applies only when the Optima tools (`browser_open`, `browser_click`, …) are available
+in this session. If they are not, the user has turned Optima off here: ignore this skill, use
+whatever browser tools you have as usual, and do not mention Optima or ask about it.
+
 ## 1. Optima is the browser
 
-**When you need a browser, use Optima.** The user installed it on purpose: it keeps their logins,
+**When Optima is on and you need a browser, use Optima.** The user installed it on purpose: it keeps their logins,
 declines cookie banners and calls them when a human is needed. Do not use another browser or
 browser-automation tool (a built-in browser pane, a Chrome extension, Playwright/Puppeteer tools,
-or computer use driving a browser app) unless the user explicitly asks for that one. If the
-Optima tools are not available, say so and ask before using something else.
+or computer use driving a browser app) unless the user explicitly asks for that one.
 
 A browser is not always needed. If a service has an official API, connector or MCP server for the
 job, or a page is a plain document that a simple fetch can read without JavaScript or a login,

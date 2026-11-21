@@ -143,7 +143,10 @@ On macOS `/path/to/python` is your `python3`; on Windows and Linux it is the one
 | `browser_wait(seconds)` | Wait for slow pages |
 | `browser_recent_actions(limit?)` | Today's audit log |
 
-The bundled **skill** (`skill/optima/SKILL.md`) teaches the assistant when to use Optima (APIs and
+The bundled **skill** (`skill/optima/SKILL.md`) only applies where Optima is turned on: if the
+`browser_*` tools are not available in a chat (for example you disabled the `optima` MCP server
+there), the assistant ignores the skill and uses its usual browser without mentioning Optima.
+Where Optima is on, it teaches the assistant when to use Optima (APIs and
 connectors first), how to act by element id, when to call you, and to always confirm purchases,
 messages and deletions with you.
 
