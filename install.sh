@@ -12,7 +12,7 @@ mkdir -p "$OPTIMA_HOME"
 APP="$OPTIMA_HOME/app"
 rm -rf "$APP"
 mkdir -p "$APP"
-cp -R "$HERE/src" "$HERE/skill" "$HERE/assets" "$APP/"
+cp -R "$HERE/src" "$APP/"
 find "$APP" -name __pycache__ -type d -prune -exec rm -rf {} +
 export PYTHONPATH="$APP/src"
 
@@ -25,7 +25,7 @@ case "$(uname -s)" in
       echo "The Swift compiler is missing. Run: xcode-select --install  (then run this script again)"
       exit 1
     fi
-    sh "$HERE/engines/macos/build.sh" "$OPTIMA_HOME/engine" >/dev/null
+    sh "$HERE/src/optima/macos/build.sh" "$OPTIMA_HOME/engine" >/dev/null
     # Double-click it to browse yourself (e.g. log in to your sites).
     mkdir -p "$HOME/Applications"
     ln -sfn "$OPTIMA_HOME/engine/Optima.app" "$HOME/Applications/Optima AI Browser.app"

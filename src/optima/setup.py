@@ -17,7 +17,7 @@ from . import brand, config
 from .engines import EngineError, make_engine
 from .i18n import LANGUAGES, STRINGS, t
 
-SKILL_SRC = config.REPO_DIR / "skill" / brand.SLUG
+SKILL_SRC = config.PACKAGE_DIR / "skill"
 
 
 # ---------- where things live ----------
@@ -59,6 +59,9 @@ def detect_clients() -> List[Dict[str, Any]]:
 
 def server_command() -> Dict[str, Any]:
     """How assistants start Optima's MCP server."""
+    if not config.is_source_checkout():
+        # Installed with pip: the package is importable without extra settings.
+        return {"command": sys.executable, "args": ["-m", brand.SLUG, "mcp"]}
     return {
         "command": sys.executable,
         "args": ["-m", brand.SLUG, "mcp"],
@@ -68,6 +71,8 @@ def server_command() -> Dict[str, Any]:
 
 def launcher_command() -> Dict[str, Any]:
     """Same server, started through a launcher file instead of PYTHONPATH."""
+    if not config.is_source_checkout():
+        return {"command": sys.executable, "args": ["-m", brand.SLUG, "mcp"]}
     return {"command": sys.executable, "args": [str(config.REPO_DIR / "src" / "optima_launcher.py"), "mcp"]}
 
 
@@ -175,7 +180,7 @@ def apply(lang: str, clients: List[str]) -> List[str]:
 
 def welcome_html() -> str:
     html = (config.PACKAGE_DIR / "welcome.html").read_text("utf-8")
-    icon = config.REPO_DIR / "assets" / "icon-256.png"
+    icon = config.PACKAGE_DIR / "assets" / "icon-256.png"
     icon_uri = "data:image/png;base64," + base64.b64encode(icon.read_bytes()).decode() if icon.exists() else ""
     return (html.replace("__STRINGS__", json.dumps(STRINGS, ensure_ascii=False))
                 .replace("__LANGS__", json.dumps(LANGUAGES, ensure_ascii=False))
@@ -185,6 +190,13 @@ def welcome_html() -> str:
 
 def run_gui() -> bool:
     cfg = config.load()
+    if config.resolve_engine(cfg) == "webkit" and not config.webkit_app_path().exists():
+        print("Building the macOS engine (one time)…")
+        try:
+            config.build_macos_engine()
+        except Exception as e:  # no Swift compiler, for example
+            print(f"Could not build the macOS engine: {e}. Install the Command Line Tools with: xcode-select --install")
+            return False
     engine = make_engine(cfg)
     try:
         engine.start()

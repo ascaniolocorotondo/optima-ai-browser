@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "optima-ai-browser"
+version = "0.2.0"
+description = "A browser built for AI assistants: clean page text for the agent, a human hand-off for CAPTCHAs, logins and payments. MCP server + Agent Skill."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [{ name = "ascaniolocorotondo" }]
+keywords = ["mcp", "mcp-server", "model-context-protocol", "ai-agents", "browser", "browser-automation", "claude", "agent-skills"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: MacOS X",
+  "Intended Audience :: Developers",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Topic :: Internet :: WWW/HTTP :: Browsers",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# macOS uses the native WebKit engine (standard library only); Windows and Linux use Playwright.
+dependencies = ["playwright>=1.45; sys_platform != 'darwin'"]
+
+[project.optional-dependencies]
+playwright = ["playwright>=1.45"]
+
+[project.scripts]
+optima = "optima.__main__:main"
+optima-ai-browser = "optima.__main__:main"  # lets `uvx optima-ai-browser mcp` work
+
+[project.urls]
+Homepage = "https://github.com/ascaniolocorotondo/optima-ai-browser"
+Issues = "https://github.com/ascaniolocorotondo/optima-ai-browser/issues"
+Glama = "https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["optima"]
+
+[tool.setuptools.package-data]
+optima = ["*.js", "*.html", "assets/*", "skill/*", "macos/*.swift", "macos/*.plist", "macos/*.sh", "macos/*.icns"]

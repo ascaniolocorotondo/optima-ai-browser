@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Optima AI Browser" width="320">
+  <img src="https://raw.githubusercontent.com/ascaniolocorotondo/optima-ai-browser/main/assets/logo.png" alt="Optima AI Browser" width="320">
 </p>
 
 <p align="center">
@@ -58,7 +58,19 @@ need one:
 You need **Python 3.9+**. On macOS you also need the Swift compiler (Xcode or the Command Line
 Tools: `xcode-select --install`).
 
-### macOS
+### With pip (all systems)
+
+```bash
+pip install optima-ai-browser
+optima setup
+```
+
+`optima setup` opens the first-run window (on macOS it compiles the native engine the first time).
+On Windows and Linux, if Playwright has no browser yet: `python -m playwright install chromium`.
+
+Or run the MCP server without installing anything permanently: `uvx optima-ai-browser mcp`.
+
+### From source: macOS
 
 ```bash
 git clone https://github.com/ascaniolocorotondo/optima-ai-browser.git
@@ -69,7 +81,7 @@ sh install.sh
 On macOS the installer also adds **Optima AI Browser** to `~/Applications`. Double-click it to
 browse yourself, for example to log in to your sites: your assistant shares the same logins.
 
-### Linux
+### From source: Linux
 
 ```bash
 git clone https://github.com/ascaniolocorotondo/optima-ai-browser.git
@@ -79,7 +91,7 @@ sh install.sh
 
 If Chromium complains about missing libraries: `sudo ~/.optima/venv/bin/python -m playwright install-deps chromium`.
 
-### Windows (PowerShell)
+### From source: Windows (PowerShell)
 
 ```powershell
 git clone https://github.com/ascaniolocorotondo/optima-ai-browser.git
@@ -115,7 +127,13 @@ library."*
 
 ### Connecting other MCP clients
 
-Any MCP client can use Optima. The server command needs no environment variables:
+Any MCP client can use Optima. If you installed it with pip:
+
+```json
+{ "command": "optima", "args": ["mcp"] }
+```
+
+From source, use the launcher (no environment variables needed):
 
 ```json
 {
@@ -125,7 +143,7 @@ Any MCP client can use Optima. The server command needs no environment variables
 ```
 
 On macOS `/path/to/python` is your `python3`; on Windows and Linux it is the one in
-`~/.optima/venv`. Copy `skill/optima/` into your assistant's skills folder if it supports
+`~/.optima/venv`. Copy `src/optima/skill/` into your assistant's skills folder if it supports
 [Agent Skills](https://agentskills.io).
 
 ## Tools for the agent
@@ -144,7 +162,7 @@ On macOS `/path/to/python` is your `python3`; on Windows and Linux it is the one
 | `browser_wait(seconds)` | Wait for slow pages |
 | `browser_recent_actions(limit?)` | Today's audit log |
 
-The bundled **skill** (`skill/optima/SKILL.md`) only applies where Optima is turned on: if the
+The bundled **skill** (`src/optima/skill/SKILL.md`) only applies where Optima is turned on: if the
 `browser_*` tools are not available in a chat (for example you disabled the `optima` MCP server
 there), the assistant ignores the skill and uses its usual browser without mentioning Optima.
 Where Optima is on, it teaches the assistant when to use Optima (APIs and
@@ -206,6 +224,14 @@ Run them with `PYTHONPATH=~/.optima/app/src` (or from the repo's `src` folder).
 Issues and pull requests are welcome. Keep the principles above: features that help an agent
 evade CAPTCHAs, fingerprinting or bot detection won't be merged.
 
+## How it was made
+
+Optima was designed by [@ascaniolocorotondo](https://github.com/ascaniolocorotondo) and written
+largely with the help of [Claude](https://claude.com) (Anthropic's AI assistant), then tested on
+macOS, Windows and Linux in CI.
+
 ## License
 
 [MIT](LICENSE)
+
+<!-- mcp-name: io.github.ascaniolocorotondo/optima-ai-browser -->

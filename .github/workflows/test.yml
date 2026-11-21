@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build native engine
-        run: sh engines/macos/build.sh
+        run: sh src/optima/macos/build.sh
       - name: macOS version
         run: sw_vers
       - name: End-to-end test (native WebKit engine)
@@ -76,3 +76,31 @@ jobs:
             '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
             | docker run -i --rm optima | tee out.jsonl
           python3 -c "import json; r=[json.loads(l) for l in open('out.jsonl')]; assert r[0]['result']['serverInfo']['name']=='optima'; assert len(r[1]['result']['tools'])==11; print('container OK')"
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and check the PyPI package
+        run: |
+          pip install build twine
+          python -m build
+          twine check dist/*
+      - name: Versions match
+        run: |
+          python3 -c "
+          import json, re
+          v = re.search(r'version = \"(.+?)\"', open('pyproject.toml').read()).group(1)
+          s = json.load(open('server.json'))
+          i = re.search(r'__version__ = \"(.+?)\"', open('src/optima/__init__.py').read()).group(1)
+          assert v == i == s['version'] == s['packages'][0]['version'], (v, i, s['version'])
+          print('version', v)"
+      - name: Install the wheel and answer MCP introspection
+        run: |
+          python -m venv /tmp/v && /tmp/v/bin/pip install dist/*.whl
+          cd /tmp
+          printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}' '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | /tmp/v/bin/optima-ai-browser mcp > out.jsonl
+          python3 -c "import json; r=[json.loads(l) for l in open('/tmp/out.jsonl')]; assert len(r[1]['result']['tools'])==11; print('installed package OK')"

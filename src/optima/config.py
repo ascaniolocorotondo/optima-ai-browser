@@ -14,7 +14,8 @@ CONFIG_FILE = HOME / "config.json"
 LOG_DIR = HOME / "logs"
 PROFILE_DIR = HOME / "profile"          # Playwright profile (cookies, logins)
 PACKAGE_DIR = Path(__file__).resolve().parent
-REPO_DIR = PACKAGE_DIR.parent.parent
+REPO_DIR = PACKAGE_DIR.parent.parent  # only meaningful in a source checkout
+MACOS_SRC = PACKAGE_DIR / "macos"      # Swift sources of the macOS engine
 
 DEFAULTS: Dict[str, Any] = {
     "language": None,                    # set on first run
@@ -80,4 +81,19 @@ def webkit_app_path() -> Path:
     installed = HOME / "engine" / "Optima.app"
     if installed.exists():
         return installed
-    return REPO_DIR / "engines" / "macos" / "build" / "Optima.app"
+    return MACOS_SRC / "build" / "Optima.app"
+
+
+def is_source_checkout() -> bool:
+    """True when running from a git clone (src/optima), False when installed with pip."""
+    return PACKAGE_DIR.parent.name == "src" and (REPO_DIR / "pyproject.toml").exists()
+
+
+def build_macos_engine() -> Path:
+    """Compiles the native macOS engine into ~/.optima/engine (needs the Swift compiler)."""
+    import subprocess
+    out = HOME / "engine"
+    out.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["sh", str(MACOS_SRC / "build.sh"), str(out)], check=True,
+                   stdout=subprocess.DEVNULL)
+    return out / "Optima.app"

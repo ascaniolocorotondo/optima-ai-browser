@@ -1,0 +1,3 @@
+[console_scripts]
+optima = optima.__main__:main
+optima-ai-browser = optima.__main__:main

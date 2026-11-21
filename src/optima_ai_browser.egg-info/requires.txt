@@ -1,0 +1,6 @@
+
+[:sys_platform != "darwin"]
+playwright>=1.45
+
+[playwright]
+playwright>=1.45

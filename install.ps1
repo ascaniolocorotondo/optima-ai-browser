@@ -10,7 +10,7 @@ New-Item -ItemType Directory -Force -Path $OptimaHome | Out-Null
 $App = Join-Path $OptimaHome "app"
 if (Test-Path $App) { Remove-Item -Recurse -Force $App }
 New-Item -ItemType Directory -Force -Path $App | Out-Null
-foreach ($d in @("src", "skill", "assets")) { Copy-Item -Recurse (Join-Path $Here $d) (Join-Path $App $d) }
+Copy-Item -Recurse (Join-Path $Here "src") (Join-Path $App "src")
 $env:PYTHONPATH = Join-Path $App "src"
 
 function Say($m) { Write-Host "==> $m" -ForegroundColor Cyan }

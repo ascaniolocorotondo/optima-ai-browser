@@ -93,7 +93,7 @@ class WebKitEngine(Engine):
         app = config.webkit_app_path()
         binary = app / "Contents" / "MacOS" / "OptimaEngine"
         if not binary.exists():
-            raise EngineError(f"macOS engine not built. Run: sh engines/macos/build.sh  (looked in {app})")
+            raise EngineError(f"macOS engine not built. Run: optima build-engine  (looked in {app})")
         suffix = "Version/18.0 Safari/605.1.15"
         if self.cfg.get("identify_as_agent", True):
             from . import __version__

@@ -4,6 +4,7 @@
   mcp       run the MCP server (what assistants start)
   open URL  open the browser yourself, e.g. to log in to your sites
   doctor    check the installation
+  build-engine  compile the native macOS engine (macOS only)
 """
 from __future__ import annotations
 
@@ -24,7 +25,7 @@ def doctor() -> None:
     print(f"  engine:   {engine}")
     if engine == "webkit":
         app = config.webkit_app_path()
-        print(f"  app:      {app} ({'ok' if app.exists() else 'missing: run engines/macos/build.sh'})")
+        print(f"  app:      {app} ({'ok' if app.exists() else 'missing: run optima build-engine'})")
     else:
         try:
             import playwright  # noqa: F401
@@ -69,6 +70,8 @@ def main() -> None:
         open_url(args[1])
     elif cmd == "doctor":
         doctor()
+    elif cmd == "build-engine":
+        print(config.build_macos_engine())
     elif cmd in ("-v", "--version", "version"):
         print(__version__)
     else:

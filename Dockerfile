@@ -12,7 +12,6 @@ RUN if [ "$WITH_BROWSER" = "1" ]; then \
       python -m playwright install --with-deps chromium; \
     fi
 COPY src ./src
-COPY skill ./skill
 
 ENV PYTHONPATH=/app/src \
     OPTIMA_HOME=/data \
