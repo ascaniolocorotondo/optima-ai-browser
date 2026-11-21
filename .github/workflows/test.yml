@@ -1,0 +1,59 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Playwright Chromium system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          pip install -r requirements.txt
+          sudo python -m playwright install-deps chromium
+
+      - name: Run installer (Linux)
+        if: runner.os == 'Linux'
+        run: printf '1\n' | sh install.sh --cli
+
+      - name: Run installer (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: '"1" | powershell -ExecutionPolicy Bypass -File install.ps1 --cli'
+
+      - name: Doctor
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then PY="$HOME/.optima/venv/Scripts/python.exe"; else PY="$HOME/.optima/venv/bin/python"; fi
+          PYTHONPATH="$HOME/.optima/app/src" "$PY" -m optima doctor
+
+      - name: End-to-end test (installed venv, headless)
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then PY="$HOME/.optima/venv/Scripts/python.exe"; else PY="$HOME/.optima/venv/bin/python"; fi
+          "$PY" tests/e2e.py --engine playwright --headless
+
+      - name: End-to-end test (with a window, Linux virtual display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a "$HOME/.optima/venv/bin/python" tests/e2e.py --engine playwright
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build native engine
+        run: sh engines/macos/build.sh
+      - name: End-to-end test (native WebKit engine)
+        run: python3 tests/e2e.py --engine webkit

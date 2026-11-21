@@ -1,0 +1,10 @@
+<!doctype html><html><head><title>Negozio di prova</title></head><body>
+<div id="cookie-banner" style="position:fixed;bottom:0;background:#eee;padding:10px">Usiamo i cookie. <button onclick="this.parentNode.remove()">Accetta tutto</button> <button onclick="this.parentNode.remove();document.title='Cookie rifiutati'">Rifiuta tutto</button></div>
+<h1>Negozio</h1>
+<form action="/cerca" onsubmit="event.preventDefault();document.getElementById('r').textContent='Risultati per: '+this.q.value">
+<label for="q">Cerca</label><input id="q" name="q"><button type="submit">Cerca</button></form>
+<p id="r"></p>
+<form><label>Email <input type="email" name="email"></label><label>Password <input type="password" name="pw"></label></form>
+<button onclick="alert('comprato')">Acquista ora</button>
+<a href="/check.html">Area protetta</a>
+</body></html>

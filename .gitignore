@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+engines/macos/build/
+.DS_Store
+.venv/

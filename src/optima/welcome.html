@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optima AI Browser</title>
+<style>
+  :root {
+    --navy: #05183a; --navy-2: #0a2550; --cyan: #10c8f0; --cyan-dim: #0b8fb0;
+    --text: #e8f4fb; --muted: #9db3c8; --line: rgba(16, 200, 240, .22);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(1200px 700px at 50% -10%, var(--navy-2), var(--navy));
+    color: var(--text); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .card { width: 100%; max-width: 640px; text-align: center; }
+  .logo { width: 128px; height: 128px; border-radius: 28px; box-shadow: 0 0 60px rgba(16, 200, 240, .25); }
+  .brand { margin: 18px 0 2px; font-weight: 800; letter-spacing: .18em; font-size: 34px; color: var(--cyan); }
+  .sub { margin: 0 0 28px; letter-spacing: .32em; font-size: 12px; color: var(--text); font-style: italic; }
+  h2 { font-size: 22px; margin: 0 0 8px; }
+  p { color: var(--muted); margin: 0 0 22px; }
+  .hint { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+  .langs { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  button.lang, button.main {
+    font: inherit; cursor: pointer; border-radius: 12px; transition: transform .08s, background .15s, border-color .15s;
+  }
+  button.lang {
+    padding: 14px 10px; background: rgba(255, 255, 255, .04); color: var(--text); border: 1px solid var(--line);
+    font-size: 17px; font-weight: 600;
+  }
+  button.lang:hover, button.lang:focus-visible { border-color: var(--cyan); background: rgba(16, 200, 240, .1); outline: none; }
+  button.main {
+    margin-top: 22px; padding: 12px 28px; border: 0; background: var(--cyan); color: var(--navy); font-weight: 700;
+  }
+  button.main:hover { background: #46d8f7; }
+  button.main:disabled { background: var(--cyan-dim); cursor: default; }
+  button:active { transform: scale(.98); }
+  .clients { text-align: left; display: grid; gap: 10px; margin: 0 auto; max-width: 420px; }
+  label.client {
+    display: flex; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--line);
+    border-radius: 12px; background: rgba(255, 255, 255, .03); cursor: pointer;
+  }
+  label.client.off { opacity: .5; cursor: default; }
+  label.client input { width: 18px; height: 18px; accent-color: var(--cyan); }
+  label.client small { display: block; color: var(--muted); font-size: 12px; }
+  ul.results { text-align: left; max-width: 520px; margin: 0 auto 18px; padding: 0; list-style: none; }
+  ul.results li { padding: 8px 12px; border-left: 3px solid var(--cyan); background: rgba(255, 255, 255, .03);
+    margin-bottom: 6px; border-radius: 0 8px 8px 0; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+  .step { display: none; animation: fade .25s ease; }
+  .step.on { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div class="card">
+  <img class="logo" src="__ICON__" alt="">
+  <div class="brand">OPTIMA</div>
+  <div class="sub">AI BROWSER</div>
+
+  <section class="step on" id="s-lang">
+    <h2 id="t-choose">Choose your language</h2>
+    <div class="hint" id="t-choose-all"></div>
+    <div class="langs" id="langs"></div>
+  </section>
+
+  <section class="step" id="s-connect">
+    <h2 data-t="welcome_title"></h2>
+    <p data-t="welcome_body"></p>
+    <h2 data-t="connect_title" style="font-size:18px"></h2>
+    <p data-t="connect_body"></p>
+    <div class="clients" id="clients"></div>
+    <button class="main" id="finish" data-t="finish"></button>
+  </section>
+
+  <section class="step" id="s-done">
+    <h2 data-t="done_title"></h2>
+    <ul class="results" id="results"></ul>
+    <p data-t="done_body"></p>
+    <div class="hint" data-t="close_hint"></div>
+  </section>
+</div>
+
+<script>
+  var STRINGS = __STRINGS__;
+  var LANGS = __LANGS__;
+  var CLIENTS = __CLIENTS__;
+  var lang = 'en';
+
+  function tr(key) { return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key; }
+  function show(id) {
+    document.querySelectorAll('.step').forEach(function (s) { s.classList.toggle('on', s.id === id); });
+  }
+  function paint() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = tr(el.getAttribute('data-t')); });
+  }
+
+  // Step 1: language. Guess from the system, but always let the person choose.
+  var sys = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  var order = Object.keys(LANGS).sort(function (a, b) { return (b === sys) - (a === sys); });
+  document.getElementById('t-choose').textContent = (STRINGS[sys] || STRINGS.en).choose_language;
+  document.getElementById('t-choose-all').textContent = order.filter(function (k) { return k !== sys; })
+    .map(function (k) { return STRINGS[k].choose_language; }).join(' · ');
+  var box = document.getElementById('langs');
+  order.forEach(function (code) {
+    var b = document.createElement('button');
+    b.className = 'lang';
+    b.textContent = LANGS[code];
+    b.onclick = function () { lang = code; paint(); buildClients(); show('s-connect'); };
+    box.appendChild(b);
+  });
+  setTimeout(function () { var f = box.querySelector('button'); if (f) f.focus(); }, 50);
+
+  // Step 2: which assistants to connect.
+  function buildClients() {
+    var c = document.getElementById('clients');
+    c.innerHTML = '';
+    CLIENTS.forEach(function (cl) {
+      var l = document.createElement('label');
+      l.className = 'client' + (cl.found ? '' : ' off');
+      var i = document.createElement('input');
+      i.type = 'checkbox'; i.checked = cl.found; i.disabled = !cl.found; i.value = cl.key;
+      var s = document.createElement('span');
+      s.textContent = tr(cl.key);
+      if (!cl.found) { var sm = document.createElement('small'); sm.textContent = tr('not_found'); s.appendChild(sm); }
+      l.appendChild(i); l.appendChild(s);
+      c.appendChild(l);
+    });
+  }
+
+  document.getElementById('finish').onclick = function () {
+    var picked = Array.prototype.map.call(document.querySelectorAll('#clients input:checked'), function (i) { return i.value; });
+    this.disabled = true;
+    this.textContent = tr('working');
+    window.__optimaSetup = { lang: lang, clients: picked };
+  };
+
+  // Step 3: called by the installer with a list of result lines.
+  window.__optimaDone = function (lines) {
+    var ul = document.getElementById('results');
+    ul.innerHTML = '';
+    lines.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+    show('s-done');
+    return 'ok';
+  };
+</script>
+</body>
+</html>
