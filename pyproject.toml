@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "optima-ai-browser"
-version = "0.2.0"
+version = "0.2.1"
 description = "A browser built for AI assistants: clean page text for the agent, a human hand-off for CAPTCHAs, logins and payments. MCP server + Agent Skill."
 readme = "README.md"
 license = "MIT"
