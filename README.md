@@ -9,7 +9,9 @@
 
 <p align="center">
   <a href="https://github.com/ascaniolocorotondo/optima-ai-browser/actions/workflows/test.yml"><img src="https://github.com/ascaniolocorotondo/optima-ai-browser/actions/workflows/test.yml/badge.svg" alt="tests"></a>
-  <a href="https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser"><img src="https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser/badges/score.svg" alt="Glama score"></a><br>
+  <a href="https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser"><img src="https://glama.ai/mcp/servers/ascaniolocorotondo/optima-ai-browser/badges/score.svg" alt="Glama score"></a>
+  <a href="https://pypi.org/project/optima-ai-browser/"><img src="https://img.shields.io/pypi/v/optima-ai-browser?label=PyPI" alt="PyPI"></a>
+  <a href="https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ascaniolocorotondo/optima-ai-browser"><img src="https://img.shields.io/badge/MCP%20Registry-listed-0b8fb0" alt="MCP Registry"></a><br>
   macOS · Windows · Linux &nbsp;|&nbsp; MCP server + Claude skill &nbsp;|&nbsp; MIT
 </p>
 
@@ -59,6 +61,8 @@ You need **Python 3.9+**. On macOS you also need the Swift compiler (Xcode or th
 Tools: `xcode-select --install`).
 
 ### With pip (all systems)
+
+Optima is on [PyPI](https://pypi.org/project/optima-ai-browser/) and in the [official MCP registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ascaniolocorotondo/optima-ai-browser) as `io.github.ascaniolocorotondo/optima-ai-browser`.
 
 ```bash
 pip install optima-ai-browser
