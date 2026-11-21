@@ -7,4 +7,16 @@
 <form><label>Email <input type="email" name="email"></label><label>Password <input type="password" name="pw"></label></form>
 <button onclick="alert('comprato')">Acquista ora</button>
 <a href="/check.html">Area protetta</a>
+<p id="diag"></p>
+<script>
+  var n = +(sessionStorage.loads || 0) + 1; sessionStorage.loads = n;
+  var nav = (performance.getEntriesByType('navigation')[0] || {}).type;
+  document.getElementById('diag').textContent = 'Diag loads=' + n + ' nav=' + nav + ' search=' + location.search +
+    ' submits=' + (sessionStorage.submits || 0);
+  document.addEventListener('submit', function (e) {
+    sessionStorage.submits = +(sessionStorage.submits || 0) + 1;
+    sessionStorage.lastSubmit = (e.target.getAttribute('action') || '(none)') + ' prevented=' + e.defaultPrevented;
+  }, true);
+  if (sessionStorage.lastSubmit) document.getElementById('diag').textContent += ' last=' + sessionStorage.lastSubmit;
+</script>
 </body></html>
