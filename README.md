@@ -230,9 +230,9 @@ evade CAPTCHAs, fingerprinting or bot detection won't be merged.
 
 ## How it was made
 
-Optima was designed by [@ascaniolocorotondo](https://github.com/ascaniolocorotondo) and written
-largely with the help of [Claude](https://claude.com) (Anthropic's AI assistant), then tested on
-macOS, Windows and Linux in CI.
+Optima is made by Ascanio ([@ascaniolocorotondo](https://github.com/ascaniolocorotondo)) with the
+help of [Claude](https://claude.com), Anthropic's AI assistant. It is tested on macOS, Windows and
+Linux in CI.
 
 ## License
 
